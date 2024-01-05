@@ -12,15 +12,6 @@ RUN apt-get update \
     libfontconfig1 \
     libxrender1
 
-ARG UID
-ARG GID
-ARG USER
-# docker-composeからuid等を受け取る
-
-RUN groupadd -g $GID $USER
-RUN useradd -u $UID -g $USER -m $USER
-# コンテナでユーザーとグループの追加
-
 RUN docker-php-ext-configure gd --with-freetype --with-jpeg
 RUN docker-php-ext-install gd
 RUN docker-php-ext-install bcmath
@@ -40,3 +31,12 @@ RUN npm --version
 WORKDIR /hokuriku-hougen-cheer
 ADD . /hokuriku-hougen-cheer/storage
 RUN chown -R www-data:www-data /hokuriku-hougen-cheer/storage
+
+ARG UID
+ARG GID
+ARG USER
+# docker-composeからuid等を受け取る
+
+RUN groupadd -g $GID $USER
+RUN useradd -u $UID -g $USER -m $USER
+# コンテナでユーザーとグループの追加
