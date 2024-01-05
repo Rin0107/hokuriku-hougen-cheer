@@ -1,0 +1,41 @@
+services:
+  db:
+    image: postgres
+    environment:
+      POSTGRES_PASSWORD: secret
+      POSTGRES_DB: hokuriku_hougen_cheer
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - '5432:5432'
+
+  app:
+    user: '${UID}:${GID}'
+    build:
+      args:
+        UID: '${UID}'
+        GID: '${GID}'
+        USER: '${USER}'
+      # ~/.bashrcでuid等のpathを通しておく
+      context: ./docker/php
+      dockerfile: Dockerfile
+    volumes:
+      - ./:/hokuriku-hougen-cheer
+      - /hokuriku-hougen-cheer/node_modules
+      - /hokuriku-hougen-cheer/vendor
+      - ./docker/php/php.ini:/usr/local/etc/php/php.ini
+    depends_on:
+      - db
+
+  web:
+    build:
+      context: ./docker/nginx
+    depends_on:
+      - app
+    ports:
+      - 80:80
+    volumes:
+      - ./:/hokuriku-hougen-cheer
+
+volumes:
+  postgres_data:
